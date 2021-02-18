@@ -32,7 +32,7 @@ extension {{ api.name }} {
          requestBodyCreator: RequestBodyCreator = ApolloRequestBodyCreator(),
          store: ApolloStore = ApolloStore(cache: InMemoryNormalizedCache())) {
 
-		let provider = LegacyInterceptorProvider(client: client, store: store)
+		let provider = NetworkInterceptorProvider(client: client, store: store)
 		let networkTransport = RequestChainNetworkTransport(interceptorProvider: provider,
 															endpointURL: url,
 															autoPersistQueries: enableAutoPersistedQueries,
@@ -42,6 +42,21 @@ extension {{ api.name }} {
         self.init(client: ApolloClient(networkTransport: networkTransport, store: store))
     }
 
+}
+
+final class NetworkInterceptorProvider: LegacyInterceptorProvider, CustomizableInterceptor {
+    
+    override func interceptors<Operation: GraphQLOperation>(for operation: Operation) -> [ApolloInterceptor] {
+        var interceptors = super.interceptors(for: operation)
+        if let headers = headers() {
+            interceptors.insert(AppProvidedInterceptor(headers: headers), at: 0)
+        }
+        return interceptors
+    }
+}
+
+protocol CustomizableInterceptor {
+    func headers() -> [(name: String, value: String)]?
 }
 
 {% for type in api.types %}
