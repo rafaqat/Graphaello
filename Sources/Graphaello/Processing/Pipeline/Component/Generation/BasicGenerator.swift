@@ -1,5 +1,5 @@
 import Foundation
-
+import CLIKit
 struct BasicGenerator: Generator {
 
     private let structureAPIVersion = 12
@@ -13,9 +13,11 @@ struct BasicGenerator: Generator {
             .map(\.name)
             .sorted()
 
+        Console.print(title: "👻 Code generat method started opened", indentation: 1)
         return try code(context: ["usedTypes" : prepared.usedTypes]) {
             StructureAPI().withFormatting(format: useFormatting).cached(alongWith: structureAPIVersion, using: prepared.cache)
             prepared.apis.map { api in
+                // TODO: - check this step
                 return api
                     .withFormatting(format: useFormatting)
                     .cached(
@@ -26,11 +28,13 @@ struct BasicGenerator: Generator {
 
             // TODO: Find a way to cache structs as well
             prepared.structs.map { prepared in
+                // TODO: - check this step
                 return prepared
                     .withFormatting(format: useFormatting)
             }
 
             prepared.allConnectionFragments.map { connectionFragment in
+                // TODO: - check this step
                 return connectionFragment
                     .withFormatting(format: useFormatting)
                     .cached(

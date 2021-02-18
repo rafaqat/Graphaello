@@ -105,6 +105,9 @@ class AddAPICommand : Command {
 
     @CommandRequiredInput(description: "URL to the GraphQL API.")
     var url: URL
+    
+    @CommandOption(default: Optional<String>.none, description: "Authorization token for the API, please for now use only the token itself, without Bearer prefix.")
+    var authToken: String?
 
     @CommandFlag(description: "Should not cache generated code.")
     var skipCache: Bool
@@ -125,7 +128,10 @@ class AddAPICommand : Command {
         request.httpBody = try JSONSerialization.data(withJSONObject: ["query" : query])
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.addValue("application/json", forHTTPHeaderField: "Accept")
-
+        if let authToken = authToken {
+            // TODO: - Make logic generic, so any header can be added
+            request.addValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
+        }
         let dispatchGroup = DispatchGroup()
 
         var responseData: Data?

@@ -17,6 +17,9 @@ class UpdateAPICommand : Command {
 
     @CommandRequiredInput(description: "Name for the API.")
     var apiName: String
+    
+    @CommandRequiredInput(description: "Authorization bearer token for URL, please add the token without Bearer prefix.")
+    var authToken: String
 
     var description: String {
         return "Updates an API Schema from your project"
@@ -39,6 +42,7 @@ class UpdateAPICommand : Command {
 
         let addAPICommand = AddAPICommand()
         addAPICommand.apiName = apiName
+        addAPICommand.authToken = authToken
         addAPICommand.project = project
         addAPICommand.skipGencode = skipGencode
         addAPICommand.skipCache = skipCache
