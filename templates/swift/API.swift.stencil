@@ -55,6 +55,28 @@ final class NetworkInterceptorProvider: LegacyInterceptorProvider, CustomizableI
     }
 }
 
+final private class AppProvidedInterceptor: ApolloInterceptor {
+    
+    let headers: [(name: String, value: String)]
+    
+    init(headers: [(name: String, value: String)]) {
+        self.headers = headers
+    }
+    
+    func interceptAsync<Operation: GraphQLOperation>(
+        chain: RequestChain,
+        request: HTTPRequest<Operation>,
+        response: HTTPResponse<Operation>?,
+        completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void) {
+        for header in headers {
+            request.addHeader(name: header.name, value: header.value)
+        }
+        chain.proceedAsync(request: request,
+                           response: response,
+                           completion: completion)
+    }
+}
+
 protocol CustomizableInterceptor {
     func headers() -> [(name: String, value: String)]?
 }
